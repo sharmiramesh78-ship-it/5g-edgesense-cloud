@@ -11,13 +11,13 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                bat 'docker build -t edgesense-cloud .'
+                bat '"C:\\Users\\R SHARMI\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" build -t edgesense-cloud .'
             }
         }
 
         stage('Verify Docker Image') {
             steps {
-                bat 'docker image inspect edgesense-cloud'
+                bat '"C:\\Users\\R SHARMI\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" image inspect edgesense-cloud'
             }
         }
     }
