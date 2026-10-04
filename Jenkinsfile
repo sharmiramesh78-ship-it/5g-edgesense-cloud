@@ -20,5 +20,11 @@ pipeline {
                 bat '"C:\\Users\\R SHARMI\\AppData\\Local\\Programs\\DockerDesktop\\resources\\bin\\docker.exe" image inspect edgesense-cloud'
             }
         }
+
+        stage('Test Application') {
+            steps {
+                bat 'curl.exe -f http://localhost:8000/api/docs'
+            }
+        }
     }
 }
