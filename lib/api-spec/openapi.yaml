@@ -3,13 +3,15 @@ info:
   # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Simulated industrial machine telemetry for 5G EdgeSense Cloud
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: telemetry
+    description: Simulated machine telemetry
 paths:
   /healthz:
     get:
@@ -24,6 +26,78 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [telemetry]
+      summary: Get the latest dashboard snapshot
+      responses:
+        "200":
+          description: Current machine, reading, and alert summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Dashboard"
+  /machines:
+    get:
+      operationId: getMachines
+      tags: [telemetry]
+      summary: List simulated machines and their current status
+      responses:
+        "200":
+          description: Machines
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Machine"
+  /readings:
+    get:
+      operationId: getReadings
+      tags: [telemetry]
+      summary: Get recent simulated temperature readings
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 300
+            default: 60
+      responses:
+        "200":
+          description: Readings grouped by machine
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Reading"
+  /alerts:
+    get:
+      operationId: getAlerts
+      tags: [telemetry]
+      summary: Get recent simulated overheating alerts
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        "200":
+          description: Recent alerts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Alert"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +107,61 @@ components:
           type: string
       required:
         - status
+    Machine:
+      type: object
+      required: [id, name, location, status, connectivity, temperature_c, threshold_c, last_updated, signal_strength]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        location: { type: string }
+        status: { type: string, enum: [normal, warning] }
+        connectivity: { type: string, enum: [connected, disconnected] }
+        temperature_c: { type: number }
+        threshold_c: { type: number }
+        last_updated: { type: string, format: date-time }
+        signal_strength: { type: integer, minimum: 0, maximum: 100 }
+    Reading:
+      type: object
+      required: [machine_id, temperature_c, timestamp]
+      properties:
+        machine_id: { type: string }
+        temperature_c: { type: number }
+        timestamp: { type: string, format: date-time }
+    Alert:
+      type: object
+      required: [id, machine_id, machine_name, message, severity, temperature_c, timestamp, acknowledged]
+      properties:
+        id: { type: string }
+        machine_id: { type: string }
+        machine_name: { type: string }
+        message: { type: string }
+        severity: { type: string, enum: [critical] }
+        temperature_c: { type: number }
+        timestamp: { type: string, format: date-time }
+        acknowledged: { type: boolean }
+    DashboardSummary:
+      type: object
+      required: [total_machines, connected_machines, online_machines, active_alerts, avg_temperature_c]
+      properties:
+        total_machines: { type: integer }
+        connected_machines: { type: integer }
+        online_machines: { type: integer }
+        active_alerts: { type: integer }
+        avg_temperature_c: { type: number }
+    Dashboard:
+      type: object
+      required: [summary, machines, readings, alerts, updated_at, simulated]
+      properties:
+        summary: { $ref: "#/components/schemas/DashboardSummary" }
+        machines:
+          type: array
+          items: { $ref: "#/components/schemas/Machine" }
+        readings:
+          type: array
+          items: { $ref: "#/components/schemas/Reading" }
+        alerts:
+          type: array
+          items: { $ref: "#/components/schemas/Alert" }
+        updated_at: { type: string, format: date-time }
+        simulated: { type: boolean }
 

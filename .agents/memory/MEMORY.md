@@ -1,0 +1,1 @@
+- [Artifact API routing](artifact-api-routing.md) — the shared proxy sends `/api` to its dedicated API service, not the root web artifact.

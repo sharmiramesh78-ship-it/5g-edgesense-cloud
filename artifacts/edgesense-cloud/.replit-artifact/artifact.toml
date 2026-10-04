@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "5G EdgeSense Cloud"
+description = "An industrial IoT dashboard that streams clearly labeled simulated temperature readings from three machines, with connectivity, status, chart history, and overheating alerts."
+version = "1.0.0"
+id = "artifacts/edgesense-cloud"
+router = "path"
+
+[[services]]
+name = "web"
+paths = ["/"]
+localPort = 23641
+
+[services.development]
+run = "pnpm --filter @workspace/edgesense-cloud run dev"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/edgesense-cloud", "run", "build"]
+serve = "static"
+publicDir = "artifacts/edgesense-cloud/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23641"
+BASE_PATH = "/"

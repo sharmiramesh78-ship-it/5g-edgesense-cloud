@@ -1,45 +1,30 @@
-# [Project name]
+# 5G EdgeSense Cloud
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Industrial IoT dashboard demo that streams clearly labeled simulated telemetry from three machines.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- Open the app preview at `/`; the `artifacts/edgesense-cloud: web` workflow serves the dashboard.
+- The `artifacts/api-server: API Server` workflow serves FastAPI endpoints at `/api`.
+- Standalone FastAPI run from the workspace root:
+  `python -m uvicorn backend.main:app --app-dir artifacts/edgesense-cloud --host 0.0.0.0 --port 8000`
+- Run API tests:
+  `python -m unittest discover -s artifacts/edgesense-cloud/tests -v`
+- Regenerate API clients after changing `lib/api-spec/openapi.yaml`:
+  `pnpm --filter @workspace/api-spec run codegen`
+- `pnpm run typecheck` checks the remaining TypeScript workspace packages.
 
 ## Stack
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Frontend: plain HTML, CSS, and browser JavaScript, served by the Vite web artifact.
+- Backend: Python 3.11+, FastAPI, and Uvicorn.
+- Telemetry is generated in memory; no database, device integration, cloud vendor, or paid service is used.
+- The React files in the web artifact are unused scaffold files; the dashboard entry point is `artifacts/edgesense-cloud/index.html`.
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
-
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- `artifacts/edgesense-cloud/backend/` — FastAPI app and simulator
+- `artifacts/edgesense-cloud/static/` — dashboard styles and browser logic
+- `artifacts/edgesense-cloud/tests/` — API tests
+- `artifacts/edgesense-cloud/README.md` — setup, API, and test instructions
+- `lib/api-spec/openapi.yaml` — generated API contract
